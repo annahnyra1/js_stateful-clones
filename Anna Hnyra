@@ -1,0 +1,46 @@
+function transformStateWithClones(state, actions) {
+  let currentState = { ...state }; // Создаем копию исходного состояния
+  const stateHistory = [];
+
+  for (const action of actions) {
+    switch (action.type) {
+      case 'clear':
+        currentState = {}; // Очищаем состояние
+        break;
+      case 'addProperties':
+        currentState = { ...currentState, ...action.extraData }; // Добавляем свойства
+        break;
+      case 'removeProperties':
+        currentState = { ...currentState };
+        for (const key of action.keysToRemove) {
+          delete currentState[key]; // Удаляем указанные свойства
+        }
+        break;
+      default:
+        throw new Error(`Unknown action type: ${action.type}`);
+    }
+
+    stateHistory.push({ ...currentState }); // Добавляем копию текущего состояния в историю
+  }
+
+  return stateHistory;
+}
+
+// Примеры использования
+const state1 = { foo: 'bar', bar: 'foo' };
+const actions1 = [
+  { type: 'addProperties', extraData: { name: 'Jim', hello: 'world' } },
+  { type: 'removeProperties', keysToRemove: ['bar', 'hello'] },
+  { type: 'addProperties', extraData: { another: 'one' } },
+];
+
+console.log(transformStateWithClones(state1, actions1));
+
+const state2 = { foo: 'bar', bar: 'foo' };
+const actions2 = [
+  { type: 'addProperties', extraData: { yet: 'another property' } },
+  { type: 'clear' },
+  { type: 'addProperties', extraData: { foo: 'bar', name: 'Jim' } },
+];
+
+console.log(transformStateWithClones(state2, actions2));
